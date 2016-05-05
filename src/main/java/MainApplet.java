@@ -57,13 +57,14 @@ public class MainApplet extends PApplet{
 	}
 
 	public void draw() {
-background(255);
+		background(255);
 		
 		stroke(60, 119, 119);
-		strokeWeight(4);
 		for(Character character: this.characters){
-			for(Character target: character.getTargets())
+			for(Character target: character.getTargets()){
+				strokeWeight(target.getLinkValue());
 				line(character.getX(), character.getY(), target.getX(), target.getY());
+			}
 		}
 		
 		for(Character character: this.characters)
@@ -80,11 +81,11 @@ background(255);
 		
 		for(int i=0; i<nodes.size(); i++){
 			JSONObject node = nodes.getJSONObject(i);
-			characters.add(new Character(this, node.getString("name"), random(100, 650), random(100, 650)));
+			characters.add(new Character(this, node.getString("name"),node.getInt("value"),node.getString("colour"), random(100, 650), random(100, 650)));
 		}
 		for(int i=0; i<links.size(); i++){
 			JSONObject link = links.getJSONObject(i);
-			characters.get(link.getInt("source")).addTarget(characters.get(link.getInt("target")));
+			characters.get(link.getInt("source")).addTarget(characters.get(link.getInt("target")), link.getInt("value"));
 		}
 		
 		
