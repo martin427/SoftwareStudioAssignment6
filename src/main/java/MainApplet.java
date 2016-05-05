@@ -67,8 +67,10 @@ public class MainApplet extends PApplet{
 			}
 		}
 		
-		for(Character character: this.characters)
+		for(Character character: this.characters){
 			character.display();
+		}
+			
 	}
 
 	private void loadData(){
@@ -78,10 +80,17 @@ public class MainApplet extends PApplet{
 		links = data.getJSONArray("links");
 		System.out.println("Number of nodes: " + nodes.size());
 		System.out.println("Number of links: " + links.size());
-		
+		int setY=1;
+		int setX=0;
 		for(int i=0; i<nodes.size(); i++){
 			JSONObject node = nodes.getJSONObject(i);
-			characters.add(new Character(this, node.getString("name"),node.getInt("value"),node.getString("colour"), random(100, 650), random(100, 650)));
+			setX++;
+			characters.add(new Character(this, node.getString("name"),node.getInt("value"),node.getString("colour"), 30*setX, 30*setY+200));
+			if((i+1)%4==0){
+				setY++;
+				setX=0;
+			}
+			
 		}
 		for(int i=0; i<links.size(); i++){
 			JSONObject link = links.getJSONObject(i);

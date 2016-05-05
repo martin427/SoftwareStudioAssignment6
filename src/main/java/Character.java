@@ -1,6 +1,8 @@
 package main.java;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
@@ -9,7 +11,7 @@ import processing.core.PApplet;
 * This class is used to store states of the characters in the program.
 * You will need to declare other variables depending on your implementation.
 */
-public class Character {
+public class Character extends MouseAdapter{
 	
 	private float x, y, radius;
 	private int nodeValue;
@@ -29,12 +31,13 @@ public class Character {
 		this.x = x;
 		this.y = y;
 		this.radius = 25;
-		
+
 		this.targets = new ArrayList<Character>();
 	}
 
 	public void display(){
 		this.parent.noStroke();
+		this.parent.addMouseMotionListener(this);
 		this.parent.fill(r, g, b);
 		//Color.decode(colour);
 		this.parent.ellipse(x, y, radius, radius);
@@ -62,6 +65,12 @@ public class Character {
         g = Integer.valueOf( colorStr.substring( 3, 5 ), 16 );
         b = Integer.valueOf( colorStr.substring( 5, 7 ), 16 );
 	}
+	public void mouseDragged(MouseEvent e) {
+		this.x = e.getX();
+		this.y = e.getY();
+		System.out.println(name + "X: " + x + " Y: " + y);
+        //System.out.println("mouseDragged");
+    }
 	
 	public float getX(){
 		return this.x;
