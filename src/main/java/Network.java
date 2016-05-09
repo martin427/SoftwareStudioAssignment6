@@ -10,6 +10,7 @@ import processing.core.PApplet;
 */
 public class Network {
 	
+	@SuppressWarnings("unused")
 	private PApplet parent;
 
 	public Network(PApplet parent){

@@ -5,21 +5,33 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import main.java.Character;
+import main.java.MainApplet;
 import processing.core.PApplet;
 
 /**
 * This class is used to store states of the characters in the program.
 * You will need to declare other variables depending on your implementation.
 */
-public class Character extends MouseAdapter{
+
+
+@SuppressWarnings("unused")
+public class Character{
 	
-	private float x, y, radius;
+	float x,y;
+	private float radius;
+	private float X,Y;
 	private int nodeValue;
 	private int linkValue;
+	
 	private int r,g,b;
+	
 	private MainApplet parent;
 	private String name,colour;
-	private ArrayList<Character> targets;
+	private boolean inCircle;
+	
+	private ArrayList<Character> targets = new ArrayList<Character>();
+	private ArrayList<Integer> weights = new ArrayList<Integer>();
 
 	public Character(MainApplet parent, String name,int value,String colour, float x, float y){
 
@@ -30,26 +42,40 @@ public class Character extends MouseAdapter{
 		transfer_hex_to_rgb(this.colour);
 		this.x = x;
 		this.y = y;
-		this.radius = 25;
+		this.X = x;
+		this.Y = y;
+		this.radius = 20;
 
 		this.targets = new ArrayList<Character>();
 	}
 
 	public void display(){
 		this.parent.noStroke();
-		this.parent.addMouseMotionListener(this);
 		this.parent.fill(r, g, b);
-		//Color.decode(colour);
 		this.parent.ellipse(x, y, radius, radius);
 		//this.parent.rect(x-name.length()*10, y-20, name.length()*20, 40, 12, 12, 12, 12);
+		if(inCircle){
+			for(Character character : targets){
+				parent.noFill();
+				parent.stroke(0);
+				parent.strokeWeight(weights.get(targets.indexOf(character))/(float)5);
+				
+				float a = (550+(x+character.x)/2)/2;
+				float b = (340+(y+character.y)/2)/2;
+				if(character.isInCircle()){
+					parent.bezier(x, y, a, b, a, b, character.x, character.y);
+				}
+				
+			}
+		}
 		
-		this.parent.textSize(13);
-		this.parent.fill(255);
-		this.parent.text(name, x-name.length()*10+5, y+10);
 	}
-	public void addTarget(Character target, int linkValue){ 
-		target.linkValue = linkValue;
-		this.targets.add(target);
+	
+	
+	
+	public void addTarget(Character target, int weight){ 
+		targets.add(target);
+		weights.add(weight);
 	}
 	
 	public ArrayList<Character> getTargets(){ return this.targets; }
@@ -65,20 +91,25 @@ public class Character extends MouseAdapter{
         g = Integer.valueOf( colorStr.substring( 3, 5 ), 16 );
         b = Integer.valueOf( colorStr.substring( 5, 7 ), 16 );
 	}
-	public void mouseDragged(MouseEvent e) {
-		this.x = e.getX();
-		this.y = e.getY();
-		System.out.println(name + "X: " + x + " Y: " + y);
-        //System.out.println("mouseDragged");
-    }
+	public void setInCircle(boolean input){
+		inCircle = input;
+	}
+	
+	public boolean isInCircle(){
+		return inCircle;
+	}
+	
+	public String getName(){
+		return name;
+	}
 	
 	public float getX(){
-		return this.x;
+		return X;
 	}
 	public float getY(){
-		return this.y;
+		return Y;
 	}
 	public float getRadius(){
-		return this.radius;
+		return radius;
 	}
 }
