@@ -142,12 +142,12 @@ public class MainApplet extends PApplet{
 			}
 		}
 		
-		for(Character character: this.characters){
+		/*for(Character character: this.characters){
 			for(Character target: character.getTargets()){
 				strokeWeight(target.getLinkValue());
 				line(character.x, character.y, target.x, target.y);
 			}
-		}
+		}*/
 	}
 		public void mousePressed(){
 			if(overNode){
