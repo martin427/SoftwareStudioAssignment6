@@ -5,8 +5,15 @@ import processing.event.*;
 import processing.event.KeyEvent;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
+
+import javax.imageio.ImageIO;
+
 import controlP5.ControlP5;
 import de.looksgood.ani.Ani;
 import processing.core.PApplet;
@@ -27,16 +34,16 @@ public class MainApplet extends PApplet{
 	private String fileTail = "-interactions.json";
     private Ani ani;
 	private ControlP5 cp5;
-	
+	private BufferedImage starwars;
 	JSONObject[] data = new JSONObject[10];
 	JSONArray[] nodes = new JSONArray[10]; 
 	JSONArray[] links = new JSONArray[10];
 	private ArrayList<Character> characters = new ArrayList<Character>();
-	private int episode = 1;// which episode are you in
+	private int episode = 1;
 	private final static int width = 1200, height = 650;
 	
 	private boolean overNode;
-	private Character lockNode, overNodeWhileNotPressed;
+	private Character lockNode, mouseonnode;
 	
 	
 	public void setup() {
@@ -48,28 +55,75 @@ public class MainApplet extends PApplet{
 		cp5 = new ControlP5(this);
 		
 		cp5.addButton("button1").setLabel("ADD ALL")
-		.setPosition(875,50)
+		.setPosition(900,350)
 		.setSize(200, 50);
 		cp5.addButton("button2").setLabel("CLEAR")
-		.setPosition(875,150)
+		.setPosition(900,450)
 		.setSize(200, 50);
 		cp5.addButton("button3").setLabel("Next Episode")
-		.setPosition(875,250)
+		.setPosition(900,550)
 		.setSize(200,50);
 		
+		try {
+			starwars = ImageIO.read(new File("starwars.jpg"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public void button1(){
+		    int tmp = 0;
+			float angle = 0;
 		for(Character character : characters){
 			character.setInCircle(true);
+			if(character.isInCircle()){
+				tmp++;
+			}
 		}
-		moveAllInCircle();
-	}
+			for(Character character: characters){
+				if(character.isInCircle()){
+					ani = Ani.to(character, (float) 0.1, "x", 600+250*cos(angle)) ;
+					ani = Ani.to(character, (float) 0.1, "y", 350-250*sin(angle)) ;
+					angle += (TWO_PI/tmp);
+				}
+			}
+				
+		}
+	
+	
 	public void button2(){
 		for(Character character : characters){
 			character.setInCircle(false);
-			ani = Ani.to(character, (float) 1, "x", character.getX());
-			ani = Ani.to(character, (float) 1, "y", character.getY());
+			ani = Ani.to(character, (float) 2, "x", character.getX());
+			ani = Ani.to(character, (float) 2, "y", character.getY());
 			
+		}
+	}
+	
+	public void button3(){
+		if(episode<7){
+			episode++;
+		}else{
+			episode=1;
+		}
+		loadNodeAndLink();
+	}
+		
+	
+	private void moveNodeToCircle(){
+		int tmp = 0;
+		float angle = 0;
+		for(Character character : characters){
+			if(character.isInCircle()){
+				tmp++;
+			}
+		}
+		for(Character character : characters){
+			if(character.isInCircle()){
+				character.x = 600+250*cos(angle);
+				character.y = 350-250*sin(angle);
+				angle += (TWO_PI/tmp);
+			}
 		}
 	}
 	
@@ -101,26 +155,42 @@ public class MainApplet extends PApplet{
 	}
 
 	public void draw() {
-		background(255);
-		//draw the circle
+		background(0);
+		//circle
 		fill(255);
-		stroke(60, 119, 119);
-		if(lockNode != null && dist(lockNode.x,lockNode.y,550,340)<520/2){
-			strokeWeight(10);
-		}else strokeWeight(5);
-		ellipse(550,340,520,520);
+		stroke(150, 80, 20);	
+		strokeWeight(10);
+		ellipse(600,350,500,500);
 		
-		textSize(40);
-		fill(100,50,20);
-		text("Star Wars " + String.valueOf(episode), 485, 50);
+		//words
+		PFont wordstyle;
+		wordstyle = createFont("Ethnocentric",36,true);
+		
+		textFont(wordstyle,26);
+		this.fill(100,90,60);
+		if(episode==1){
+			this.text("Star Wars  I: The Phantom Menace", 320, 50);
+		}else if(episode==2){
+			this.text("Star Wars  II: Attack of the Clones", 320, 50);	
+		}else if(episode==3){
+			this.text("Star Wars  III: Revenge of the Sith", 320, 50);	
+		}else if(episode==4){
+			this.text("Star Wars  IV: A New Hope", 320, 50);	
+		}else if(episode==5){
+			this.text("Star Wars  V: The Empire Strikes Back", 320, 50);	
+		}else if(episode==6){
+			this.text("Star Wars  VI: Return of the Jedi", 320, 50);	
+		}else{
+			this.text("Star Wars  VII: The Force Awakens", 320, 50);	
+		}
 		
 		for(Character character : characters){
 			character.display();
 			if(dist(character.x, character.y, mouseX, mouseY) < 20 / 2 && !mousePressed){
-				overNodeWhileNotPressed = character;
+				mouseonnode = character;
 			}
 			else{
-				ani = Ani.to(character, (float) 0.5, "diameter", 20);
+				ani = Ani.to(character, (float) 0.5, "radious", 20);
 			}
 		}
 		for(Character character : characters){
@@ -131,14 +201,13 @@ public class MainApplet extends PApplet{
 				overNode = false;
 			}
 		}
-		if(overNodeWhileNotPressed != null){
-			if(dist(overNodeWhileNotPressed.x,overNodeWhileNotPressed.y,mouseX,mouseY)<20){
-				ani = Ani.to(overNodeWhileNotPressed, (float) 0.5, "diameter", 50);
-				fill(0, 162, 123);
-				rect(mouseX, mouseY -  15, overNodeWhileNotPressed.getName().length() * 15, 30, 15);
+		if(mouseonnode != null){
+			if(dist(mouseonnode.x,mouseonnode.y,mouseX,mouseY)<20){
+				fill(255,180 ,84 );
+				rect(mouseX, mouseY - 15, mouseonnode.getName().length() * 30, 30, 15);
 				fill(255);
 				textSize(16);
-				text(overNodeWhileNotPressed.getName(), mouseX + 10, mouseY + 5);
+				text(mouseonnode.getName(), mouseX+20 , mouseY+5);
 			}
 		}
 		
@@ -149,9 +218,14 @@ public class MainApplet extends PApplet{
 			}
 		}*/
 	}
+	protected void paintComponet(Graphics g){
+		super.paintComponents(g);
+		g.drawImage(starwars,550,340 ,100 , 132, null);
+	}
+	
 		public void mousePressed(){
 			if(overNode){
-				lockNode = overNodeWhileNotPressed;
+				lockNode = mouseonnode;
 			}
 		}
 		public void mouseDragged(){
@@ -165,14 +239,14 @@ public class MainApplet extends PApplet{
 		
 		public void mouseReleased(){
 			if(lockNode != null){
-				if(dist(lockNode.x, lockNode.y, 550, 340) < 520 / 2){
+				if(dist(lockNode.x, lockNode.y, 600, 350) < 500 / 2){
 					lockNode.setInCircle(true);
-					moveAllInCircle();
+					moveNodeToCircle();
 				}else{
 					lockNode.setInCircle(false);
-					ani = Ani.to(lockNode, (float) 0.5, "x", lockNode.getX());
-					ani = Ani.to(lockNode, (float) 0.5, "y", lockNode.getY());
-					moveAllInCircle();
+					ani = Ani.to(lockNode, (float) 0.1, "x", lockNode.getX());
+					ani = Ani.to(lockNode, (float) 0.1, "y", lockNode.getY());
+					moveNodeToCircle();
 				}
 			}
 			lockNode = null;
@@ -213,21 +287,4 @@ public class MainApplet extends PApplet{
 		
 	}
 	
-		private void moveAllInCircle(){
-			int counter = 0;
-			float angle = 0;
-			for(Character character : characters){
-				if(character.isInCircle()){
-					counter++;
-				}
-			}
-			for(Character character : characters){
-				if(character.isInCircle()){
-					character.x = 550+260*cos(angle);
-					character.y = 340-260*sin(angle);
-					angle += (TWO_PI/(float)counter);
-				}
-			}
-		}
-		
-	}
+}

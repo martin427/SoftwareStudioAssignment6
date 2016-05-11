@@ -3,8 +3,10 @@ package main.java;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import java.io.File;
 import main.java.Character;
 import main.java.MainApplet;
 import processing.core.PApplet;
@@ -29,6 +31,8 @@ public class Character{
 	private MainApplet parent;
 	private String name,colour;
 	private boolean inCircle;
+	
+
 	
 	private ArrayList<Character> targets = new ArrayList<Character>();
 	private ArrayList<Integer> weights = new ArrayList<Integer>();
@@ -57,11 +61,11 @@ public class Character{
 		if(inCircle){
 			for(Character character : targets){
 				parent.noFill();
-				parent.stroke(0);
-				parent.strokeWeight(weights.get(targets.indexOf(character))/(float)5);
+				parent.stroke(60,80,10);
+				parent.strokeWeight(weights.get(targets.indexOf(character))/2);
 				
-				float a = (550+(x+character.x)/2)/2;
-				float b = (340+(y+character.y)/2)/2;
+				float a = (800+(x+character.x)/2)/2;
+				float b = (500+(y+character.y)/2)/2;
 				if(character.isInCircle()){
 					parent.bezier(x, y, a, b, a, b, character.x, character.y);
 				}
@@ -78,7 +82,9 @@ public class Character{
 		weights.add(weight);
 	}
 	
-	public ArrayList<Character> getTargets(){ return this.targets; }
+	public ArrayList<Character> getTargets(){ 
+		return this.targets; 
+		}
 	
 	public void setLinkValue(int linkValue){
 		this.linkValue = linkValue;
