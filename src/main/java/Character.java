@@ -38,7 +38,7 @@ public class Character{
 	private ArrayList<Integer> weights = new ArrayList<Integer>();
 
 	public Character(MainApplet parent, String name,int value,String colour, float x, float y){
-
+		//初始值設定
 		this.parent = parent;
 		this.name = name;
 		this.nodeValue = value;
@@ -48,17 +48,19 @@ public class Character{
 		this.y = y;
 		this.X = x;
 		this.Y = y;
-		this.radius = 20;
+		this.radius = 30;
 
 		this.targets = new ArrayList<Character>();
 	}
 
 	public void display(){
+		//畫角色小球
 		this.parent.noStroke();
 		this.parent.fill(r, g, b);
 		this.parent.ellipse(x, y, radius, radius);
 		//this.parent.rect(x-name.length()*10, y-20, name.length()*20, 40, 12, 12, 12, 12);
 		if(inCircle){
+			//畫連線
 			for(Character character : targets){
 				parent.noFill();
 				parent.stroke(60,80,10);
@@ -77,10 +79,7 @@ public class Character{
 	
 	
 	
-	public void addTarget(Character target, int weight){ 
-		targets.add(target);
-		weights.add(weight);
-	}
+	
 	
 	public ArrayList<Character> getTargets(){ 
 		return this.targets; 
@@ -92,6 +91,13 @@ public class Character{
 	public int getLinkValue(){
 		return this.linkValue;
 	}
+	
+	public void addTarget(Character target, int weight){ 
+		targets.add(target);
+		weights.add(weight);
+	}
+	
+	
 	public void transfer_hex_to_rgb(String colorStr){
 		r = Integer.valueOf( colorStr.substring( 1, 3 ), 16 );
         g = Integer.valueOf( colorStr.substring( 3, 5 ), 16 );

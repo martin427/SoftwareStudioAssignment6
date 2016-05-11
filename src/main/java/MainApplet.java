@@ -35,25 +35,26 @@ public class MainApplet extends PApplet{
     private Ani ani;
 	private ControlP5 cp5;
 	private BufferedImage starwars;
+	//因為是7集，所以直接寫在一個Array中
 	JSONObject[] data = new JSONObject[10];
 	JSONArray[] nodes = new JSONArray[10]; 
 	JSONArray[] links = new JSONArray[10];
 	private ArrayList<Character> characters = new ArrayList<Character>();
 	private int episode = 1;
 	private final static int width = 1200, height = 650;
-	
-	private boolean overNode;
-	private Character lockNode, mouseonnode;
+	private boolean mouseOverNode; 
+	private Character mouseLockNode, mouseOnNode; 
 	
 	
 	public void setup() {
 		size(width,height);
 		smooth();
 		loadData();
-		loadNodeAndLink();
+		loadNode();
+		link();
 		Ani.init(this);
 		cp5 = new ControlP5(this);
-		
+		//按鈕設定
 		cp5.addButton("button1").setLabel("ADD ALL")
 		.setPosition(900,350)
 		.setSize(200, 50);
@@ -65,12 +66,13 @@ public class MainApplet extends PApplet{
 		.setSize(200,50);
 		
 		try {
-			starwars = ImageIO.read(new File("starwars.jpg"));
+			starwars = ImageIO.read(new File("./starwars.jpg"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	//ALL IN 
 	public void button1(){
 		    int tmp = 0;
 			float angle = 0;
@@ -90,7 +92,7 @@ public class MainApplet extends PApplet{
 				
 		}
 	
-	
+	//CLEAR
 	public void button2(){
 		for(Character character : characters){
 			character.setInCircle(false);
@@ -99,17 +101,19 @@ public class MainApplet extends PApplet{
 			
 		}
 	}
-	
+	//next episode
 	public void button3(){
 		if(episode<7){
 			episode++;
 		}else{
 			episode=1;
 		}
-		loadNodeAndLink();
+		loadNode();
+		link();
+		
 	}
 		
-	
+	//設定球的位置
 	private void moveNodeToCircle(){
 		int tmp = 0;
 		float angle = 0;
@@ -126,7 +130,7 @@ public class MainApplet extends PApplet{
 			}
 		}
 	}
-	
+	//鍵盤事件
 	public void keyPressed(){
 		if(keyCode=='1'){
 			episode = 1;
@@ -150,10 +154,12 @@ public class MainApplet extends PApplet{
 			episode = 7;
 			
 		}
-		loadNodeAndLink();
+		loadNode();
+		link();
+	
 		
 	}
-
+       //畫出物件
 	public void draw() {
 		background(0);
 		//circle
@@ -165,7 +171,6 @@ public class MainApplet extends PApplet{
 		//words
 		PFont wordstyle;
 		wordstyle = createFont("Ethnocentric",36,true);
-		
 		textFont(wordstyle,26);
 		this.fill(100,90,60);
 		if(episode==1){
@@ -187,7 +192,7 @@ public class MainApplet extends PApplet{
 		for(Character character : characters){
 			character.display();
 			if(dist(character.x, character.y, mouseX, mouseY) < 20 / 2 && !mousePressed){
-				mouseonnode = character;
+				mouseOnNode = character;
 			}
 			else{
 				ani = Ani.to(character, (float) 0.5, "radious", 20);
@@ -195,61 +200,56 @@ public class MainApplet extends PApplet{
 		}
 		for(Character character : characters){
 			if(dist(character.x, character.y, mouseX, mouseY) < 20 / 2 && !mousePressed){
-				overNode = true;
+				mouseOverNode = true;
 				break;
 			}else{
-				overNode = false;
+				mouseOverNode = false;
 			}
 		}
-		if(mouseonnode != null){
-			if(dist(mouseonnode.x,mouseonnode.y,mouseX,mouseY)<20){
+		if(mouseOnNode != null){
+			if(dist(mouseOnNode.x,mouseOnNode.y,mouseX,mouseY)<20){
 				fill(255,180 ,84 );
-				rect(mouseX, mouseY - 15, mouseonnode.getName().length() * 30, 30, 15);
+				rect(mouseX, mouseY - 15, mouseOnNode.getName().length() * 30, 30, 15);
 				fill(255);
 				textSize(16);
-				text(mouseonnode.getName(), mouseX+20 , mouseY+5);
+				text(mouseOnNode.getName(), mouseX+20 , mouseY+5);
 			}
 		}
 		
-		/*for(Character character: this.characters){
-			for(Character target: character.getTargets()){
-				strokeWeight(target.getLinkValue());
-				line(character.x, character.y, target.x, target.y);
-			}
-		}*/
+		
 	}
 	protected void paintComponet(Graphics g){
 		super.paintComponents(g);
 		g.drawImage(starwars,550,340 ,100 , 132, null);
 	}
-	
+	    //滑鼠事件
 		public void mousePressed(){
-			if(overNode){
-				lockNode = mouseonnode;
+			if(mouseOverNode){
+				mouseLockNode = mouseOnNode;
 			}
 		}
 		public void mouseDragged(){
 			
-		if(lockNode != null){
-			lockNode.x = mouseX;
-			lockNode.y = mouseY;
+		if(mouseLockNode != null){
+			mouseLockNode.x = mouseX;
+			mouseLockNode.y = mouseY;
 		}
 			
 	}
 		
 		public void mouseReleased(){
-			if(lockNode != null){
-				if(dist(lockNode.x, lockNode.y, 600, 350) < 500 / 2){
-					lockNode.setInCircle(true);
+			if(mouseLockNode != null){
+				if(dist(mouseLockNode.x, mouseLockNode.y, 600, 350) < 500 / 2){
+					mouseLockNode.setInCircle(true);
 					moveNodeToCircle();
 				}else{
-					lockNode.setInCircle(false);
-					ani = Ani.to(lockNode, (float) 0.1, "x", lockNode.getX());
-					ani = Ani.to(lockNode, (float) 0.1, "y", lockNode.getY());
+					mouseLockNode.setInCircle(false);
+					ani = Ani.to(mouseLockNode, (float) 0.1, "x", mouseLockNode.getX());
+					ani = Ani.to(mouseLockNode, (float) 0.1, "y", mouseLockNode.getY());
 					moveNodeToCircle();
 				}
 			}
-			lockNode = null;
+			mouseLockNode = null;
 		}
 		
 		
@@ -262,29 +262,31 @@ public class MainApplet extends PApplet{
 		}
 	}
 	
-	private void loadNodeAndLink(){
+	//load Node
+	private void loadNode(){
 		characters.clear();
-		
-		int x=0,y=0;
-		
+		int a=0,b=0;
 		for(int i = 0;i<nodes[episode].size();i++ ){
-			if(i%11==0){
-				x = 35+ i*5;
-				y = 48;
+			if(i%10==0){
+				a = 30+ i*5;
+				b = 100;
 			}
 			JSONObject obj = nodes[episode].getJSONObject(i);
-			Character character = new Character(this, obj.getString("name"),i, obj.getString("colour"), (float) x, (float) y);
+			Character character = new Character(this, obj.getString("name"),i, obj.getString("colour"), (float) a, (float) b);
 			characters.add(character);
-			y+=55;
+			b+=55;
 		}
-		for(int i = 0;i<links[episode].size();i++){
+		
+	}
+	//Link
+	private void link(){
+		for(int i=0; i<links[episode].size();i++){
 			JSONObject obj = links[episode].getJSONObject(i);
 			int source = obj.getInt("source");
 			int target = obj.getInt("target");
 			int weight = obj.getInt("value");
 			characters.get(source).addTarget(characters.get(target), weight);
 		}
-		
 	}
 	
 }
